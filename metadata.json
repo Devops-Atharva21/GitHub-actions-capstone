@@ -1,0 +1,6 @@
+{
+  "name": "Tetris Clone",
+  "description": "A fully functional Tetris game with scoring, difficulty levels, customizable controls, and a leaderboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
