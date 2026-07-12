@@ -1,0 +1,14 @@
+name: Test Docker Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker:
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      image_name: tetris-game-tetris-app
+      tag: v2
+    secrets:
+      docker_username: ${{ secrets.docker_username }}
+      docker_password: ${{ secrets.docker_password }}
