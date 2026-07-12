@@ -15,4 +15,27 @@ jobs:
   docker:
     needs: build-test
 
-    uses:
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      image_name: tetris-game-tetris-app
+      tag: latest
+
+    secrets:
+      docker_username: ${{ seccrets.docker_username }}
+      docker_password: ${{ secrets.docker_password }}
+
+    deploy:
+      needs: docker
+
+      runs-on: ubuntu-latest
+
+      environment:
+        name: production
+
+      steps:
+        - name: Deploy Applicaton
+          run: | 
+            echo "Deploying image: ${{ needs.docker.outputs.image_url }} to production"
+
+        - name: Deployment Complete
+          run: echo "Deployment Successful"
