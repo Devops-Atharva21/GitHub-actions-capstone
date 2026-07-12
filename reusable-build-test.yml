@@ -1,0 +1,54 @@
+name: Tetris App Build and Test
+
+on:
+  worklfow_call:
+    inputs:
+      node_version:
+        description: "node.js version"
+        required: true
+        type: string
+
+      run_tests:
+        description: "Run tests"
+        required: false
+        default: true
+        type: boolean
+    
+      outputs:
+        tests_result:
+        description: "Test execution ressult"
+        value: ${{ jobs.build-test.outputs.test_result }}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    outputs:
+      test_results: {{ steps.test-result.output.result }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        id: tests
+        if: ${{ inputs.run_tests }}
+        run: ./test.sh
+
+      - name: Set Test Result - Passed 
+        id: test-result
+        if: success ()
+        run: echo "result=passed" >> $GITHUB_OUTPUT
+
+      - name: Set Test Result -Failed
+        if: failuer()
+        run: echo "result=failed" >> $GITHUB_OUTPUT
+
