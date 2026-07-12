@@ -8,11 +8,11 @@ on:
         required: true
         type: string
 
-    run_tests:
-      description: "Run Tests"
-      required: false
-      default: true
-      type: boolean
+      run_tests:
+        description: "Run Tests"
+        required: false
+        default: true
+        type: boolean
 
     outputs:
       test_result:
