@@ -1,22 +1,22 @@
-name: Tetris App Build and Test
+name: Reusable Build & Test
 
 on:
-  worklfow_call:
+  workflow_call:
     inputs:
       node_version:
-        description: "node.js version"
+        description: "Node.js Version"
         required: true
         type: string
 
       run_tests:
-        description: "Run tests"
+        description: "Run Tests"
         required: false
         default: true
         type: boolean
-    
-      outputs:
-        tests_result:
-        description: "Test execution ressult"
+
+    outputs:
+      test_result:
+        description: Test Result
         value: ${{ jobs.build-test.outputs.test_result }}
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      test_results: {{ steps.test-result.output.result }}
+      test_result: ${{ steps.result.outputs.test_result }}
 
     steps:
       - name: Checkout Repository
@@ -38,17 +38,42 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Build Application
+        run: npm run build
+
+      - name: Pull Docker Image
+        run: docker pull dockeratharva29/tetris-game-tetris-app:latest
+
+      - name: Run Docker Container
+        if: ${{ inputs.run_tests }}
+        run: | 
+          docker run -d \
+            --name tetris-app \
+            -p 3000:80 \
+            dockeratharva29/tetris-game-tetris-app:latest
+
+      - name: Wait for Application
+        if: ${{ inputs.run_tests }}
+        run: sleep 10
+
       - name: Run Tests
-        id: tests
         if: ${{ inputs.run_tests }}
         run: ./test.sh
 
-      - name: Set Test Result - Passed 
-        id: test-result
-        if: success ()
-        run: echo "result=passed" >> $GITHUB_OUTPUT
+      - name: Set Test Result
+        id: result
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "test_result=passed" >> $GITHUB_OUTPUT
+          else
+            echo "test_result=failed" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Set Test Result -Failed
-        if: failuer()
-        run: echo "result=failed" >> $GITHUB_OUTPUT
+      - name: Stop Container
+        if: always() && inputs.run_tests
+        run: |
+          docker stop tetris-app || true
+          docker rm tetris-app || true
+  
 

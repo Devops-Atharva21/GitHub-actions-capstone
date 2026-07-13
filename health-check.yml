@@ -1,0 +1,51 @@
+name: Scheduled Health Check
+
+on: 
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Latest Docker Image
+        run: |
+          docker pull dockeratharva29/tetris-game-tetris-app:latest
+
+      - name: Run Docker Container
+        run: |
+          docker run -d \
+            --name tetris-app \
+            -p 3000:80 \
+            dockeratharva29/tetris-game-tetris-app:latest
+
+      - name: Wait for Application
+        run: sleep 5
+
+      - name: Perform Health Check
+        id: health
+        run: |
+          if curl -f http://localhost:3000/ > /dev/null; then
+            echo "Application is healthy."
+            echo "status=PASSED" >> $GITHUB_OUTPUT
+
+          else
+            echo "Application health check failed."
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop and Remove Container
+        if: always()
+        run: |
+          docker stop tetris-app || true
+          docker rm tetris-app || true
+
+      - name: Generate Health Check Summary
+        if: always()
+        run: |
+          echo "## Health Check Report" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: dockeratharva29/tetris-game-tetris-app:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ steps.health.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(date)" >> $GITHUB_STEP_SUMMARY
