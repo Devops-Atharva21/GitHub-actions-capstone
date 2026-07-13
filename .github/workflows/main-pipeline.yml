@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-test:
-    uses: ./.github/workflow/reusable-build-test.yml
+    uses: ./.github/workflows/reusable-build-test.yml
     with:
       node_version: "20"
       run_tests: true
@@ -18,24 +18,21 @@ jobs:
     uses: ./.github/workflows/reusable-docker.yml
     with:
       image_name: tetris-game-tetris-app
-      tag: latest
 
     secrets:
-      docker_username: ${{ seccrets.docker_username }}
-      docker_password: ${{ secrets.docker_password }}
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
+      docker_password: ${{ secrets.DOCKER_PASSWORD }}
 
-    deploy:
-      needs: docker
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    environment:
+      name: production
 
-      runs-on: ubuntu-latest
-
-      environment:
-        name: production
-
-      steps:
-        - name: Deploy Applicaton
-          run: | 
-            echo "Deploying image: ${{ needs.docker.outputs.image_url }} to production"
+    steps:
+      - name: Deploy Application
+        run: | 
+          echo "Deploying image: ${{ needs.docker.outputs.image_url }} to production"
 
         - name: Deployment Complete
           run: echo "Deployment Successful"

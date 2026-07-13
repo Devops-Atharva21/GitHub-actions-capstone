@@ -16,7 +16,7 @@ on:
 
     outputs:
       test_result:
-        description: "Build/Test Result"
+        description: Test Result
         value: ${{ jobs.build-test.outputs.test_result }}
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
         run: npm run build
 
       - name: Pull Docker Image
-        run: docker pull dockeratharva29/tetris-game-tetris-app:v1
+        run: docker pull dockeratharva29/tetris-game-tetris-app:latest
 
       - name: Run Docker Container
         if: ${{ inputs.run_tests }}
@@ -50,7 +50,7 @@ jobs:
           docker run -d \
             --name tetris-app \
             -p 3000:80 \
-            dockeratharva29/tetris-game-tetris-app:v1
+            dockeratharva29/tetris-game-tetris-app:latest
 
       - name: Wait for Application
         if: ${{ inputs.run_tests }}
@@ -60,18 +60,20 @@ jobs:
         if: ${{ inputs.run_tests }}
         run: ./test.sh
 
-      - name: Set Test Result - Passed
+      - name: Set Test Result
         id: result
-        if: success()
-        run: echo "test_result=passed" >> $GITHUB_OUTPUT
-      
-      - name: Set Test Result - Failed
-        if: failure
-        run: echo "test_result=failed" >> $GITHUB_OUTPUT
-  
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "test_result=passed" >> $GITHUB_OUTPUT
+          else
+            echo "test_result=failed" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Stop and Remove Container
+      - name: Stop Container
         if: always() && inputs.run_tests
         run: |
           docker stop tetris-app || true
           docker rm tetris-app || true
+  
+
