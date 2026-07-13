@@ -53,17 +53,22 @@ jobs:
             dockeratharva29/tetris-game-tetris-app:v1
 
       - name: Wait for Application
-        if: ${{ inputs.run_test }}
+        if: ${{ inputs.run_tests }}
         run: sleep 10
 
       - name: Run Tests
         if: ${{ inputs.run_tests }}
         run: ./test.sh
 
-      - name: Set Test Result
+      - name: Set Test Result - Passed
         id: result
         if: success()
         run: echo "test_result=passed" >> $GITHUB_OUTPUT
+      
+      - name: Set Test Result - Failed
+        if: failure
+        run: echo "test_result=failed" >> $GITHUB_OUTPUT
+  
 
       - name: Stop and Remove Container
         if: always() && inputs.run_tests
