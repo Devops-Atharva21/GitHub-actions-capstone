@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build-test:
     uses: ./.github/workflows/reusable-build-test.yml

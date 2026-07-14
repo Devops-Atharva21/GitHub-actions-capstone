@@ -8,6 +8,10 @@ on:
       - opened
       - synchronize
 
+permissions:
+  content: read
+  pull-requests: read  
+
 jobs:
   build-test:
     uses: ./.github/workflows/reusable-build-test.yml
