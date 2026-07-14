@@ -10,7 +10,7 @@ on:
         type: string
 
     secrets:
-      docker_username:
+      docker_username: ${{ secerts.DOCKER_USERNAME }}
         required: true
 
       docker_password:
@@ -50,6 +50,13 @@ jobs:
           docker build \
             -t ${{ secrets.docker_username }}/${{ inputs.image_name }}:latest \
             -t ${{ secrets.docker_username }}/${{ inputs.image_name }}:sha-${SHORT_SHA} .
+      
+      - name: Debug Image Name
+        run: |
+          echo "Username: '${{ secrets.DOCKER_USERNAME }}'"
+          echo "Image: '${{ inputs.image_name }}'"
+          echo "Full Image: '${{ secrets.docker_username }}/${{ inputs.image_name }}:llatest'"
+
 
       - name: Scan Docker Image for Vulnerabilties
         uses: aquasecurity/trivy-action@master
