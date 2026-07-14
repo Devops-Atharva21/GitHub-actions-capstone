@@ -42,7 +42,7 @@ jobs:
         run: npm run build
 
       - name: Pull Docker Image
-        run: docker pull dockeratharva29/tetris-game-tetris-app:latest
+        run: docker pull dockeratharva29/tetris-game-tetris-app:v1
 
       - name: Run Docker Container
         if: ${{ inputs.run_tests }}
@@ -50,7 +50,7 @@ jobs:
           docker run -d \
             --name tetris-app \
             -p 3000:80 \
-            dockeratharva29/tetris-game-tetris-app:latest
+            dockeratharva29/tetris-game-tetris-app:v1
 
       - name: Wait for Application
         if: ${{ inputs.run_tests }}
