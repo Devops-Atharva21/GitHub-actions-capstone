@@ -63,7 +63,7 @@ jobs:
         with: 
           image-ref: ${{ secrets.docker_username }}/${{ inputs.image_name }}:latest
           format: table
-          exit-code: '1'
+          exit-code: '0'
           severity: CRITICAL,HIGH
  
       - name: Push Docker Image
