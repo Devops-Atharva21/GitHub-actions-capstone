@@ -50,7 +50,14 @@ jobs:
           docker build \
             -t ${{ secrets.docker_username }}/${{ inputs.image_name }}:latest \
             -t ${{ secrets.docker_username }}/${{ inputs.image_name }}:sha-${SHORT_SHA} .
-       
+      - name: Scan Docker Image for Vulnerabilties
+        uses: aquasecurity/trivy-action@master
+        with: 
+          image-ref: ${{ inputs.image_name }}:${{ inputs.tag }}
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+ 
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.docker_username }}/${{ inputs.image_name }}:latest
