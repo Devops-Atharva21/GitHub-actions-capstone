@@ -10,7 +10,7 @@ on:
         type: string
 
     secrets:
-      docker_username: ${{ secerts.DOCKER_USERNAME }}
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
         required: true
 
       docker_password:
@@ -61,7 +61,7 @@ jobs:
       - name: Scan Docker Image for Vulnerabilties
         uses: aquasecurity/trivy-action@master
         with: 
-          image-ref: ${{ inputs.image_name }}/${{ inputs.tag }}:latest
+        image-ref: ${{ secrets.docker_username }}/${{ inputs.image_name }}:latest
           format: table
           exit-code: '1'
           severity: CRITICAL,HIGH
