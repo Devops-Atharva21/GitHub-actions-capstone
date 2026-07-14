@@ -34,5 +34,5 @@ jobs:
         run: | 
           echo "Deploying image: ${{ needs.docker.outputs.image_url }} to production"
 
-        - name: Deployment Complete
-          run: echo "Deployment Successful"
+      - name: Deployment Complete
+        run: echo "Deployment Successful"
